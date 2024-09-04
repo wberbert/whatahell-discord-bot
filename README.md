@@ -1,7 +1,3 @@
-Aqui está o README atualizado com as novas informações:
-
----
-
 # Whatahell Discord Bot
 
 O **Whatahell Discord Bot** é um bot para Project Zomboid desenvolvido em Python. Ele automatiza tarefas no jogo, incluindo comandos RCON, verificação de atualizações de mods e reinício automático do servidor após as atualizações. Este bot foi criado para ajudar administradores de servidores a gerenciar e manter seu servidor de Project Zomboid de forma eficiente, com integração ao Discord.
@@ -115,7 +111,3 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir um *pull request
 ## Licença
 
 Este projeto está licenciado sob a Licença Pública Geral GNU (GPL). Consulte o arquivo `LICENSE` para mais detalhes.
-
----
-
-Se precisar de mais alguma alteração ou de ajuda adicional, é só avisar!
