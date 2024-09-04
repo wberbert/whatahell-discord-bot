@@ -1,0 +1,6 @@
+discord.py
+zomboid-rcon
+python-dotenv
+coloredlogs
+watchdog
+paramiko

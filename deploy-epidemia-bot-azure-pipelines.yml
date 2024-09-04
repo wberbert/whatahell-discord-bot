@@ -1,0 +1,237 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  ssh_sc_epidemia  : "ssh-wh-epidemia-z"
+  sshdest_epidemia : "/home/epidemia/python/WH_bot"
+  sshhost_epidemia : "epidemia.ddns.net"
+  
+  ssh_sc_contagio  : "ssh-wh-contagio-z"
+  sshdest_contagio : "/home/contagio/python/WH_bot"
+  sshhost_contagio : "contagio.ddns.net"
+
+stages:
+  - stage: validar
+    jobs:
+    - job: "validar_dependencias"
+      pool: 
+        vmImage: ubuntu-latest
+      steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: '3.10'
+          addToPath: true
+          architecture: 'x64'
+      - script: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+          pip install pytest
+        displayName: "Instalando Dependências"
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(Build.SourcesDirectory)'
+          artifact: 'whbot-dependencias-validadas'
+          publishLocation: 'pipeline'
+
+  - stage: publicar
+    dependsOn: validar
+    jobs:
+      - job: "publicar_aplicacao_epidemia"
+        displayName: "Publicando BOT epidemia ..."
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+#          - task: DownloadPipelineArtifact@2
+#            inputs:
+#              buildType: 'current'
+#              artifactName: 'whbot-dependencias-validadas'
+#              targetPath: '$(Build.SourcesDirectory)'
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.10'
+              addToPath: true
+              architecture: 'x64'
+          - task: CopyFilesOverSSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_epidemia)
+              sourceFolder: $(Build.SourcesDirectory)
+              targetFolder: $(sshdest_epidemia)
+              contents: |
+                **/*
+                !.git/**
+                !.gitignore
+              overwrite: true
+              cleanTargetFolder: false
+            displayName: "Copiando os arquivos epidemia via SSH"
+          
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_epidemia)
+              runOptions: commands
+              interpreterCommand: 'bin/bash'
+              commands: cd $(sshdest_epidemia) && python3.10 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+            displayName: "Instalando dependencias epidemia no destino"
+
+      - job: "publicar_aplicacao_contagio"
+        displayName: "Publicando BOT contagio ..."
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+#          - task: DownloadPipelineArtifact@2
+#            inputs:
+#              buildType: 'current'
+#              artifactName: 'whbot-dependencias-validadas'
+#              targetPath: '$(Build.SourcesDirectory)'
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.10'
+              addToPath: true
+              architecture: 'x64'
+          - task: CopyFilesOverSSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_contagio)
+              sourceFolder: $(Build.SourcesDirectory)
+              targetFolder: $(sshdest_contagio)
+              contents: |
+                **/*
+                !.git/**
+                !.gitignore
+              overwrite: true
+              cleanTargetFolder: false
+            displayName: "Copiando os arquivos contagio via SSH"
+          
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_contagio)
+              runOptions: commands
+              interpreterCommand: 'bin/bash'
+              commands: cd $(sshdest_contagio) && python3.10 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+
+            displayName: "Instalando dependencias contagio no destino"
+
+      - job: configurar_epidemia
+        displayName: "Configurando BOT epidemia ..."
+        dependsOn: 
+          - "publicar_aplicacao_epidemia"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: none
+            displayName: "Pular checkout"
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_epidemia)
+              interpreterCommand: 'bin/bash'
+              runOptions: commands
+              commands: >
+                cd $(sshdest_epidemia) &&
+                echo "CANAL_ADMINISTRADOR = \"administrador\"" > .env &&
+                echo "CANAL_ANUNCIOS = \"avisos\"" >> .env &&
+                echo "CANAL_MODS = \"mods-update\"" >> .env &&
+                echo "CANAL_GERAL = \"geral\"" >> .env &&
+                echo "" >> .env &&
+                echo "CARGO_ID_NOVO_MEMBRO = \"1245978755349086238\"" >> .env &&
+                echo "" >> .env &&
+                echo "RCON_HOST = \"localhost\"" >> .env &&
+                echo "RCON_PORT = 27263" >> .env &&
+                echo "RCON_PASS = \"p@cienteZ3r0\"" >> .env &&
+                echo "" >> .env &&
+                echo "CAMINHO_LOG = \"/home/epidemia/Zomboid/Logs\"" >> .env &&
+                echo "" >> .env &&
+                echo "SSH_HOST = \"localhost\"" >> .env &&
+                echo "SSH_SENHA = \"3241891\"" >> .env &&
+                echo "SSH_USUARIO = \"epidemia\"" >> .env &&
+                echo "SYSTEM_SERVICO = \"zepidemia\"" >> .env &&
+                echo "" >> .env &&
+                echo "TOKEN = \"$(TOKEN_EPIDEMIA)\"" >> .env &&
+                echo "" >> .env &&
+                echo "BOTNOME = \"Epidemia Z\"" >> .env &&
+                echo "SITE = \"https://whatahell.fun\"" >> .env &&
+                echo "FUND = \"https://tipa.ai/whatahell\"" >> .env &&
+                echo "" >> .env &&
+                echo "EPIDEMIAZSERVIDOR = \"epidemia.ddns.net:16263\"" >> .env &&
+                echo "EPIDEMIAZNOME = \"[WH][PvP][HARD] Epidemia Z\"" >> .env &&
+                echo "EPIDEMIAZRODAPE = \"Se você gostou considere em fazer uma doação para o projeto.\"" >> .env
+
+            displayName: "Configurando ambiente epidemia"
+
+      - job: configurar_contagio
+        displayName: "Configurando BOT contagio ..."
+        dependsOn: 
+          - "publicar_aplicacao_contagio"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: none
+            displayName: "Pular checkout"
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_contagio)
+              runOptions: commands
+              interpreterCommand: 'bin/bash'
+              commands: >
+                cd $(sshdest_contagio) &&
+                echo "CANAL_ADMINISTRADOR = \"administrador\"" > .env &&
+                echo "CANAL_ANUNCIOS = \"avisos\"" >> .env &&
+                echo "CANAL_MODS = \"mods-update\"" >> .env &&
+                echo "CANAL_GERAL = \"geral\"" >> .env &&
+                echo "" >> .env &&
+                echo "CARGO_ID_NOVO_MEMBRO = \"1245978755349086238\"" >> .env &&
+                echo "" >> .env &&
+                echo "RCON_HOST = \"localhost\"" >> .env &&
+                echo "RCON_PORT = 27163" >> .env &&
+                echo "RCON_PASS = \"p@cienteZ3r0\"" >> .env &&
+                echo "" >> .env &&
+                echo "CAMINHO_LOG = \"/home/contagio/Zomboid/Logs\"" >> .env &&
+                echo "" >> .env &&
+                echo "SSH_HOST = \"localhost\"" >> .env &&
+                echo "SSH_SENHA = \"3241891\"" >> .env &&
+                echo "SSH_USUARIO = \"contagio\"" >> .env &&
+                echo "SYSTEM_SERVICO = \"zcontagio\"" >> .env &&
+                echo "" >> .env &&
+                echo "TOKEN = \"$(TOKEN_CONTAGIO)\"" >> .env &&
+                echo "" >> .env &&
+                echo "BOTNOME = \"Contagio Z\"" >> .env &&
+                echo "SITE = \"https://whatahell.fun\"" >> .env &&
+                echo "FUND = \"https://tipa.ai/whatahell\"" >> .env &&
+                echo "" >> .env &&
+                echo "EPIDEMIAZSERVIDOR = \"contagio.ddns.net:16163\"" >> .env &&
+                echo "EPIDEMIAZNOME = \"[WH][PvP][EASY] Contagio Z\"" >> .env &&
+                echo "EPIDEMIAZRODAPE = \"Se você gostou considere em fazer uma doação para o projeto.\"" >> .env
+                
+            displayName: "Configurando ambiente contagio"
+
+  - stage: reiniciar
+    dependsOn: publicar
+    jobs:
+      - job: reiniciar_bot
+        displayName: "Reiniciar BOT"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - checkout: none
+            displayName: "Pular checkout"
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_epidemia)
+              runOptions: commands
+              commands: |
+                sudo systemctl restart whbot-epidemia
+            displayName: "Reiniciando o bot epidemia ..."
+          - task: SSH@0
+            inputs:
+              sshEndpoint: $(ssh_sc_contagio)
+              runOptions: commands
+              commands: |
+                sudo systemctl restart whbot-contagio
+            displayName: "Reiniciando o bot contagio ..."
+
