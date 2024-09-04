@@ -2,6 +2,8 @@
 
 O **Whatahell Discord Bot** é um bot para Project Zomboid desenvolvido em Python. Ele automatiza tarefas no jogo, incluindo comandos RCON, verificação de atualizações de mods e reinício automático do servidor após as atualizações. Este bot foi criado para ajudar administradores de servidores a gerenciar e manter seu servidor de Project Zomboid de forma eficiente, com integração ao Discord.
 
+**Nota:** A aplicação está atualmente em versão beta. Algumas funcionalidades podem não funcionar corretamente ou estar sujeitas a mudanças. Agradecemos a sua compreensão e feedback para melhorar o bot.
+
 ## Funcionalidades
 
 - **Comandos RCON**: O bot suporta todos os comandos RCON do Project Zomboid, permitindo controle total sobre o servidor. Exemplos de comandos suportados:
@@ -98,9 +100,14 @@ As configurações do bot devem ser definidas no arquivo `.env`, como:
 - **Nome do Serviço**: Especifique o nome do serviço do sistema para gerenciar o servidor (`SYSTEM_SERVICO`).
 - **Caminho dos Logs**: Defina o caminho onde os logs do servidor são armazenados.
 - **Token do Discord**: Defina o token do bot para integração com o Discord.
+
+
 - **Informações do Servidor**: Defina o nome do bot, URL do jogo, URL de doação, URL do servidor Zomboid, nome do servidor e mensagem de rodapé.
 
 ## Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir um *pull request* ou relatar problemas na seção de *issues*.
 
+## Licença
+
+Este projeto está licenciado sob a Licença Pública Geral GNU (GPL). Consulte o arquivo `LICENSE` para mais detalhes.
