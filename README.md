@@ -1,6 +1,6 @@
 # Whatahell Discord Bot
 
-O **Whatahell Discord Bot** é um bot para Project Zomboid desenvolvido em Python. Ele automatiza tarefas no jogo, incluindo comandos RCON, verificação de atualização de mods e reinício automático do servidor após a atualização. Este bot foi criado para ajudar administradores de servidores a gerenciar e manter seu servidor de Project Zomboid de forma eficiente, com integração ao Discord.
+O **Whatahell Discord Bot** é um bot para Project Zomboid desenvolvido em Python. Ele automatiza tarefas no jogo, incluindo comandos RCON, verificação de atualizações de mods e reinício automático do servidor após as atualizações. Este bot foi criado para ajudar administradores de servidores a gerenciar e manter seu servidor de Project Zomboid de forma eficiente, com integração ao Discord.
 
 ## Funcionalidades
 
@@ -8,13 +8,13 @@ O **Whatahell Discord Bot** é um bot para Project Zomboid desenvolvido em Pytho
   - Gerenciamento de jogadores (kick, ban, whitelist, etc.)
   - Controle do servidor (iniciar, parar, reiniciar, etc.)
   - Envio de mensagens de anúncio para todos os jogadores
-  - E muitos outros comandos disponíveis no RCON.
+  - E muitos outros comandos RCON disponíveis.
 
-- **Verificação de atualização de mods**: O bot verifica automaticamente se há atualizações para os mods instalados no servidor.
+- **Verificação de Atualização de Mods**: O bot verifica automaticamente se há atualizações para os mods instalados no servidor.
 
-- **Reinício automático**: Após a detecção e instalação de atualizações de mods, o bot reinicia automaticamente o servidor para aplicar as mudanças.
+- **Reinício Automático**: Após detectar e instalar atualizações de mods, o bot reinicia automaticamente o servidor para aplicar as mudanças.
 
-- **Notificações no Discord**: O bot envia notificações sobre o status do servidor, atualizações de mods e outros eventos importantes diretamente em um canal do Discord.
+- **Notificações no Discord**: O bot envia notificações sobre o status do servidor, atualizações de mods e outros eventos importantes diretamente para um canal do Discord.
 
 ## Requisitos
 
@@ -46,39 +46,61 @@ pip install -r requirements.txt
 
 2. Certifique-se de que o servidor do Project Zomboid está configurado corretamente e que o RCON está habilitado.
 
-3. Configure o arquivo `.env` com as credenciais do servidor, integração com o Discord, e as preferências do bot. Um exemplo de arquivo `.env` pode ser encontrado abaixo:
+3. Configure o arquivo `.env` com as credenciais do servidor, integração com o Discord e preferências do bot. Aqui está um exemplo de arquivo `.env`:
 
    ```env
-   RCON_HOST=seu_ip_do_servidor
-   RCON_PORT=sua_porta_rcon
-   RCON_PASSWORD=sua_senha_rcon
-   DISCORD_TOKEN=seu_token_discord
-   DISCORD_CHANNEL_ID=id_do_canal_discord
-   CHECK_MOD_INTERVAL=3600  # Intervalo em segundos para verificar atualizações de mods
+   CANAL_ADMINISTRADOR="administrador"
+   CANAL_ANUNCIOS="anuncios"
+   CANAL_MODS="mods-update"
+   CANAL_GERAL="bate-papo"  # Canal para mensagens gerais
+
+   CARGO_ID_NOVO_MEMBRO=0  # ID do cargo inicial para novos membros
+
+   RCON_HOST="host.com"
+   RCON_PORT=27063
+   RCON_PASS="password"
+
+   SSH_HOST="host.com"
+   SSH_SENHA="123456"
+   SSH_USUARIO="user"
+   SYSTEM_SERVICO="systemd-service"
+
+   CAMINHO_LOG="<caminho dos logs do zomboid>"
+
+   TOKEN="<Token do Discord>"
+
+   BOTNOME="<nome do bot>"
+   SITE="<url do jogo>"
+   FUND="<url de doação>"
+
+   EPIDEMIAZSERVIDOR="<url do servidor Zomboid>"
+   EPIDEMIAZNOME="<nome do servidor>"
+   EPIDEMIAZRODAPE="<mensagem de rodapé>"
    ```
 
-4. Execute o bot:
+4. **Configuração de Reinício do Servidor**: Para que o reinício automático do servidor funcione corretamente, é necessário configurar o jogo para rodar como um serviço do `systemd` usando o parâmetro `SYSTEM_SERVICO`. Além disso, é preciso garantir que o usuário especificado no parâmetro `SSH_USUARIO` tenha permissões adequadas para gerenciar e reiniciar o serviço do servidor. Certifique-se de que o `systemd` está configurado corretamente para o serviço do Project Zomboid.
+
+5. Execute o bot:
 
    ```bash
    python whatahell_bot.py
    ```
 
-5. O bot executará comandos RCON conforme necessário, verificará atualizações de mods, reiniciará o servidor automaticamente e enviará notificações para o Discord. Para interromper o bot, use `Ctrl + C` no terminal.
+6. O bot executará comandos RCON conforme necessário, verificará atualizações de mods, reiniciará o servidor automaticamente e enviará notificações para o Discord. Para interromper o bot, use `Ctrl + C` no terminal.
 
 ## Configuração
 
 As configurações do bot devem ser definidas no arquivo `.env`, como:
 
-- **Credenciais do RCON**: Defina o IP, porta, e senha do RCON.
+- **Canais do Discord**: Defina os nomes apropriados dos canais para diferentes tipos de mensagens (`CANAL_ADMINISTRADOR`, `CANAL_ANUNCIOS`, `CANAL_MODS`, `CANAL_GERAL`).
+- **Credenciais RCON**: Defina o IP, porta e senha do RCON.
+- **Credenciais SSH**: Defina o host, usuário e senha SSH para gerenciamento do servidor.
+- **Nome do Serviço**: Especifique o nome do serviço do sistema para gerenciar o servidor (`SYSTEM_SERVICO`).
+- **Caminho dos Logs**: Defina o caminho onde os logs do servidor são armazenados.
 - **Token do Discord**: Defina o token do bot para integração com o Discord.
-- **Canal do Discord**: Especifique o ID do canal onde o bot enviará notificações.
-- **Intervalo de verificação de mods**: Ajuste o tempo em que o bot verifica por atualizações de mods.
-- **Comportamento de reinício**: Configure como o bot deve reiniciar o servidor após atualizações.
+- **Informações do Servidor**: Defina o nome do bot, URL do jogo, URL de doação, URL do servidor Zomboid, nome do servidor e mensagem de rodapé.
 
 ## Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir um *pull request* ou relatar problemas na seção de *issues*.
 
-## Licença
-
-Este projeto está licenciado sob a licença MIT. Consulte o arquivo `LICENSE` para mais detalhes.
